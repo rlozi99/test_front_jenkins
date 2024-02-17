@@ -48,6 +48,7 @@ pipeline {
         stage('Update Kubernetes Configuration..') {
                     steps {
                         script {
+                            sh "ls -la"
                             sh("""
                                 kustomize build overlays/development | kubectl apply -f -
                             """)
