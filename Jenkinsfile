@@ -11,6 +11,7 @@ pipeline {
         NAMESPACE = 'eunjitest'
         TAG = 'latest'
         GIT_CREDENTIALS_ID = 'jenkins-git-access'
+        KUBECONFIG = '/path/to/kubeconfig'
     }
 
 
@@ -46,17 +47,16 @@ pipeline {
                     }
                 }
         stage('Update Kubernetes Configuration..') {
-                    steps {
-                        script {
-                            sh "ls -la"
-                            sh("""
-                                kustomize build overlays/development | kubectl apply -f -
-                            """)
-                            // sh "git add ."
-                            // sh "git commit -m 'Update image to ${TAG}'"
+                steps {
+                    script {
+                        // overlays/development 디렉토리로 이동
+                        dir('overlays/development') {
+                    // kustomize를 사용하여 Kubernetes 리소스를 적용
+                        sh "kustomize build . | kubectl apply -f -"
                         }
                     }
                 }
+            }
         
     }
 }
