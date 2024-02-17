@@ -18,12 +18,16 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 checkout scm
+                script {
+                    sh "ls -la"
+                }
             }
         }
 
         stage('Build and Push Docker Image to ACR') {
             steps {
                 script {
+                    sh "ls -la"
                     withCredentials([usernamePassword(credentialsId: 'acr-credential-id', passwordVariable: 'ACR_PASSWORD', usernameVariable: 'ACR_USERNAME')]) {
                         sh "az acr login --name $CONTAINER_REGISTRY --username $ACR_USERNAME --password $ACR_PASSWORD"
                         sh "docker build -t $CONTAINER_REGISTRY/$REPO:$TAG ."
@@ -35,6 +39,9 @@ pipeline {
 
         stage('Checkout GitOps Repository') {
             steps {
+                script {
+                    sh "ls -la"
+                }
                 git branch: 'main', credentialsId: GIT_CREDENTIALS_ID, url: 'https://github.com/rlozi99/test-front-ops.git'
             }
         }
