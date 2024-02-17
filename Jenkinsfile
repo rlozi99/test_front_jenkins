@@ -35,13 +35,14 @@ pipeline {
 
         stage('Checkout GitOps Repository') {
             steps {
-                git branch: 'main', credentialsId: GIT_CREDENTIALS_ID, url: 'https://github.com/rlozi99/test-front-ops'
+                git branch: 'main', credentialsId: GIT_CREDENTIALS_ID, url: 'https://github.com/rlozi99/test-front-ops.git'
             }
         }
 
         stage('Update Kubernetes Configuration') {
             steps {
                 script {
+                    sh "ls -la"
                     // Assuming the kubeconfig is set correctly on the Jenkins agent.
                     withKubeConfig([credentialsId: 'kubeconfig-credentials-id']) {
                         // Change directory to the location of your kustomization.yaml
