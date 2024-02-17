@@ -43,6 +43,9 @@ pipeline {
                     sh "ls -la"
                 }
                 git branch: 'main', credentialsId: GIT_CREDENTIALS_ID, url: 'https://github.com/rlozi99/test-front-ops.git'
+                script {
+                    sh "ls -la"
+                }
             }
         }
 
@@ -54,7 +57,7 @@ pipeline {
                     withKubeConfig([credentialsId: 'kubeconfig-credentials-id']) {
                         // Change directory to the location of your kustomization.yaml
                         sh "ls -la"
-                        dir('front-ops/overlays/development') {
+                        dir('overlays/development') {
                             sh "ls -la"
                             sh "kustomize build . | kubectl apply -f -"
                         }
