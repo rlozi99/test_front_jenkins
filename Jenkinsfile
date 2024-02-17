@@ -42,7 +42,7 @@ pipeline {
                         // 'front_gitops' 저장소에서 파일들을 체크아웃합니다.
                         git branch: 'main',
                             credentialsId: 'jenkins-git-access',
-                            url: 'https://github.com/rlozi99/test_front_jenkins'
+                            url: 'https://github.com/rlozi99/test-front-ops'
                     }
                 }
         stage('Update Kubernetes Configuration..') {
