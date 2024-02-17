@@ -7,17 +7,15 @@ pipeline {
         CONTAINER_REGISTRY = 'goodbirdacr.azurecr.io'
         RESOURCE_GROUP = 'AKS'
         REPO = 'eunjitest_image/front'
-        IMAGE_NAME = 'eunjitest_image/front:latest'
+        IMAGE_NAME = 'eunjitest_image/front'
         NAMESPACE = 'eunjitest'
         TAG = 'latest'
         GIT_CREDENTIALS_ID = 'jenkins-git-access'
-        KUBECONFIG = '/path/to/kubeconfig'
+        KUBECONFIG = '/home/azureuser/.kube/config' // Update this path to where your kubeconfig is stored on Jenkins.
     }
 
-
-
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
                 checkout scm
             }
@@ -27,36 +25,39 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'acr-credential-id', passwordVariable: 'ACR_PASSWORD', usernameVariable: 'ACR_USERNAME')]) {
-                        // Log in to ACR
                         sh "az acr login --name $CONTAINER_REGISTRY --username $ACR_USERNAME --password $ACR_PASSWORD"
-
-                        // Build and push Docker image to ACR
-                        // 변경: 이미지 이름을 $CONTAINER_REGISTRY/$IMAGE_NAME으로 수정
                         sh "docker build -t $CONTAINER_REGISTRY/$REPO:$TAG ."
                         sh "docker push $CONTAINER_REGISTRY/$REPO:$TAG"
                     }
                 }
             }
         }
-        stage('Checkout GitOps') {
-                    steps {
-                        // 'front_gitops' 저장소에서 파일들을 체크아웃합니다.
-                        git branch: 'main',
-                            credentialsId: 'jenkins-git-access',
-                            url: 'https://github.com/rlozi99/test-front-ops'
-                    }
-                }
-        stage('Update Kubernetes Configuration..') {
-                steps {
-                    script {
-                        // overlays/development 디렉토리로 이동
-                        dir('overlays/development') {
-                    // kustomize를 사용하여 Kubernetes 리소스를 적용
-                        sh "kustomize build . | kubectl apply -f -"
+
+        stage('Checkout GitOps Repository') {
+            steps {
+                git branch: 'main', credentialsId: GIT_CREDENTIALS_ID, url: 'https://github.com/rlozi99/test-front-ops'
+            }
+        }
+
+        stage('Update Kubernetes Configuration') {
+            steps {
+                script {
+                    // Assuming the kubeconfig is set correctly on the Jenkins agent.
+                    withKubeConfig([credentialsId: 'kubeconfig-credentials-id']) {
+                        // Change directory to the location of your kustomization.yaml
+                        dir('front-ops/overlays/development') {
+                            sh "kustomize build . | kubectl apply -f -"
                         }
                     }
                 }
             }
-        
+        }
+    }
+}
+
+// This assumes you have a 'withKubeConfig' shared library or function in Jenkins to handle kubeconfig.
+def withKubeConfig(Map args, Closure body) {
+    withCredentials([file(credentialsId: args.credentialsId, variable: 'KUBECONFIG')]) {
+        body.call()
     }
 }
