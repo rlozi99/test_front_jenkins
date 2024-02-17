@@ -12,6 +12,7 @@ pipeline {
         TAG = 'latest'
         GIT_CREDENTIALS_ID = 'jenkins-git-access'
         KUBECONFIG = '/home/azureuser/.kube/config' // Update this path to where your kubeconfig is stored on Jenkins.
+        BRANCH_NAME = 'dev' // 추가된 환경 변수
     }
 
     stages {
@@ -39,13 +40,7 @@ pipeline {
 
         stage('Checkout GitOps Repository') {
             steps {
-                script {
-                    sh "ls -la"
-                }
-                git branch: 'main', credentialsId: GIT_CREDENTIALS_ID, url: 'https://github.com/rlozi99/test-front-ops.git'
-                script {
-                    sh "ls -la"
-                }
+                git branch: BRANCH_NAME, credentialsId: GIT_CREDENTIALS_ID, url: 'https://github.com/rlozi99/test-front-ops.git'
             }
         }
 
