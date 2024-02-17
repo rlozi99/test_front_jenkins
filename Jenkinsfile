@@ -45,7 +45,9 @@ pipeline {
                     // Assuming the kubeconfig is set correctly on the Jenkins agent.
                     withKubeConfig([credentialsId: 'kubeconfig-credentials-id']) {
                         // Change directory to the location of your kustomization.yaml
+                        sh "ls -la"
                         dir('front-ops/overlays/development') {
+                            sh "ls -la"
                             sh "kustomize build . | kubectl apply -f -"
                         }
                     }
