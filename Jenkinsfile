@@ -97,12 +97,12 @@ pipeline {
                     //     def remote = "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/rlozi99/test_front_jenkins.git"
                     //     // 원격 저장소에 푸시
                     //     sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/rlozi99/test-front-ops.git main"
-                    }
                 }
             }
         }
     }
 }
+
 // This assumes you have a 'withKubeConfig' shared library or function in Jenkins to handle kubeconfig.
 def withKubeConfig(Map args, Closure body) {
     withCredentials([file(credentialsId: args.credentialsId, variable: 'KUBECONFIG')]) {
