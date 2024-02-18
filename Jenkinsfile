@@ -21,7 +21,7 @@ pipeline {
     }
 
     stages{
-        stage('Check BRANCH_NAME') {
+        stage('Check BRANCH_NAME..') {
             steps {
                 script {
                     echo "Current BRANCH_NAME is ${env.BRANCH_NAME}"
