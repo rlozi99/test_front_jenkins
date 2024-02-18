@@ -12,7 +12,7 @@ pipeline {
         NAMESPACE = 'eunjitest'
 
         GIT_CREDENTIALS_ID = 'jenkins-git-access'
-        TAG = ''
+
         KUBECONFIG = '/home/azureuser/.kube/config' // Update this path to where your kubeconfig is stored on Jenkins.
 
     }
