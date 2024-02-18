@@ -34,12 +34,16 @@ pipeline {
                     
                     if (branch == 'dev') {
                         env.TAG = 'dev'
+                        env.DIR_NAME = "development"
                     } else if (branch == 'stg') {
                         env.TAG = 'stg'
+                        env.DIR_NAME = "staging"
                     } else if (branch == 'prod') {
                         env.TAG = 'latest'
+                        env.DIR_NAME = "droduction"
                     } else {
                         env.TAG = 'unknown'
+                        env.DIR_NAME = "unknown"
                     }
                     
                     echo "TAG is now set to ${env.TAG}"
@@ -81,7 +85,8 @@ pipeline {
                     withKubeConfig([credentialsId: 'kubeconfig-credentials-id']) {
                         // Change directory to the location of your kustomization.yaml
                         sh "ls -la"
-                        dir('overlays/development') {
+
+                        dir('overlays/${env.DIR_NAME}') {
                             sh "ls -la"
                             sh "kustomize build . | kubectl apply -f - -n eunjitest"
                         }
