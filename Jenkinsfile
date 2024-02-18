@@ -24,6 +24,13 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Check BRANCH_NAME') {
+            steps {
+                script {
+                    echo "Current BRANCH_NAME is ${env.BRANCH_NAME}"
+                }
+            }
+        }
         stage('Initialize') {
             steps {
                 script {
