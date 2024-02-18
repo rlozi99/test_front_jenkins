@@ -35,6 +35,7 @@ pipeline {
                     } else if (env.BRANCH_NAME == 'prod') {
                         env.TAG = 'latest' // 예시로 'latest'를 사용
                     }
+                    sh "echo "TAG is now set to ${env.TAG}""
                 }
             }
         }
