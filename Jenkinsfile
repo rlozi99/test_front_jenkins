@@ -35,10 +35,12 @@ pipeline {
                     } else if (env.BRANCH_NAME == 'prod') {
                         env.TAG = 'latest' // 예시로 'latest'를 사용
                     }
-                    sh "echo "TAG is now set to ${env.TAG}""
+                    // 환경 변수 TAG의 값을 출력
+                    sh "echo 'TAG is now set to ${env.TAG}'"
                 }
             }
         }
+
 
         stage('Build and Push Docker Image to ACR') {
             steps {
