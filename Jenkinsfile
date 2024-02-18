@@ -43,9 +43,9 @@ pipeline {
                 git branch: BRANCH_NAME, 
                 credentialsId: GIT_CREDENTIALS_ID, 
                 url: 'https://github.com/rlozi99/test-front-ops.git'
-            }
-            script {
+                script {
                     sh "ls -la"
+                }
             }
         }
 
