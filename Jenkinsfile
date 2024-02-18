@@ -86,7 +86,7 @@ pipeline {
                         // Change directory to the location of your kustomization.yaml
                         sh "ls -la"
 
-                        dir('overlays/${env.DIR_NAME}') {
+                        dir("overlays/${env.DIR_NAME}") {
                             sh "ls -la"
                             sh "kustomize build . | kubectl apply -f - -n eunjitest"
                         }
