@@ -12,9 +12,9 @@ pipeline {
         NAMESPACE = 'eunjitest'
 
         GIT_CREDENTIALS_ID = 'jenkins-git-access'
-
+        TAG = ''
         KUBECONFIG = '/home/azureuser/.kube/config' // Update this path to where your kubeconfig is stored on Jenkins.
-        BRANCH_NAME = 'main' // 추가된 환경 변수
+
     }
 
     stages{
@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     // 현재 체크아웃된 Git 브랜치 이름을 가져옵니다.
-                    def branch = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+                    def branch = sh(script: "git symbolic-ref --short HEAD", returnStdout: true).trim()
                     echo "Checked out branch: ${branch}"
                     
                     if (branch == 'dev') {
