@@ -55,8 +55,8 @@ pipeline {
                     sh "ls -la"
                     withCredentials([usernamePassword(credentialsId: 'acr-credential-id', passwordVariable: 'ACR_PASSWORD', usernameVariable: 'ACR_USERNAME')]) {
                         sh "az acr login --name $CONTAINER_REGISTRY --username $ACR_USERNAME --password $ACR_PASSWORD"
-                        sh "docker build -t $CONTAINER_REGISTRY/$REPO:$TAG ."
-                        sh "docker push $CONTAINER_REGISTRY/$REPO:$TAG"
+                        sh "docker build -t $CONTAINER_REGISTRY/$REPO:${TAG}${env.BUILD_ID} ."
+                        sh "docker push $CONTAINER_REGISTRY/$REPO:${TAG}${env.BUILD_ID}"
                     }
                 }
             }
