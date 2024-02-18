@@ -9,7 +9,7 @@ pipeline {
         REPO = 'eunjitest_image/front'
         IMAGE_NAME = 'eunjitest_image/front'
         NAMESPACE = 'eunjitest'
-        TAG = 'latest'
+        TAG = 'dev'
         GIT_CREDENTIALS_ID = 'jenkins-git-access'
         KUBECONFIG = '/home/azureuser/.kube/config' // Update this path to where your kubeconfig is stored on Jenkins.
         BRANCH_NAME = 'dev' // 추가된 환경 변수
