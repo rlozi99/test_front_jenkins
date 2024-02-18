@@ -13,8 +13,10 @@ pipeline {
 
         GIT_CREDENTIALS_ID = 'jenkins-git-access'
 
-        KUBECONFIG = '/home/azureuser/.kube/config' // Update this path to where your kubeconfig is stored on Jenkins.
+        KUBECONFIG = '/home/azureuser/.kube/config' 
 
+        //kustomize taging git push
+        NEW_IMAGE_TAG = "${env.BRANCH_NAME}.${env.BUILD_ID}"    
     }
 
     stages{
@@ -59,8 +61,8 @@ pipeline {
                     sh "ls -la"
                     withCredentials([usernamePassword(credentialsId: 'acr-credential-id', passwordVariable: 'ACR_PASSWORD', usernameVariable: 'ACR_USERNAME')]) {
                         sh "az acr login --name $CONTAINER_REGISTRY --username $ACR_USERNAME --password $ACR_PASSWORD"
-                        sh "docker build -t $CONTAINER_REGISTRY/$REPO:${TAG}${env.BUILD_ID} ."
-                        sh "docker push $CONTAINER_REGISTRY/$REPO:${TAG}${env.BUILD_ID}"
+                        sh "docker build -t $CONTAINER_REGISTRY/$REPO:$NEW_IMAGE_TAG ."
+                        sh "docker push $CONTAINER_REGISTRY/$REPO:$NEW_IMAGE_TAG"
                     }
                 }
             }
@@ -88,32 +90,46 @@ pipeline {
 
                         dir("overlays/${env.DIR_NAME}") {
                             sh "ls -la"
+                            sh "kustomize edit set image $REPO:$NEW_IMAGE_TAG"
                             sh "kustomize build . | kubectl apply -f - -n eunjitest"
                         }
                     }
                 }
             }
         }
-        stage('Push Changes to GitOps Repository') {
+
+        stage('Commit and Push Changes to GitOps Repository') {
             steps {
                 script {
-                    // 변경된 파일이 있는지 확인
-                    def hasChanges = sh(script: "git status --porcelain", returnStdout: true).trim()
-                    if (hasChanges) {
+                    dir("overlays/${env.DIR_NAME}") {
+                        // GitOps 저장소로 변경 사항을 커밋하고 푸시합니다.
                         sh "git add ."
-                        sh "git commit -m 'Update k8s configuration for ${env.BRANCH_NAME}'"
-                        // sh "git push origin ${env.BRANCH_NAME}"
-
-                        sh "git pull --rebase origin ${env.BRANCH_NAME}"
-                        def remote = "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/rlozi99/test_front_jenkins.git ${env.BRANCH_NAME}"
-                        // 원격 저장소에 푸시
-                        sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/rlozi99/test-front-ops.git ${env.BRANCH_NAME}"
-                    } else {
-                        echo "No changes to commit."
+                        sh "git commit -m 'Update image tag to $NEW_IMAGE_TAG'"
+                        sh "git push origin ${env.BRANCH_NAME}"
                     }
                 }
             }
         }
+        // stage('Push Changes to GitOps Repository') {
+        //     steps {
+        //         script {
+        //             // 변경된 파일이 있는지 확인
+        //             def hasChanges = sh(script: "git status --porcelain", returnStdout: true).trim()
+        //             if (hasChanges) {
+        //                 sh "git add ."
+        //                 sh "git commit -m 'Update k8s configuration for ${env.BRANCH_NAME}'"
+        //                 // sh "git push origin ${env.BRANCH_NAME}"
+
+        //                 sh "git pull --rebase origin ${env.BRANCH_NAME}"
+        //                 def remote = "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/rlozi99/test_front_jenkins.git ${env.BRANCH_NAME}"
+        //                 // 원격 저장소에 푸시
+        //                 sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/rlozi99/test-front-ops.git ${env.BRANCH_NAME}"
+        //             } else {
+        //                 echo "No changes to commit."
+        //             }
+        //         }
+        //     }
+        // }
 
 
 
