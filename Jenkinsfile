@@ -11,19 +11,13 @@ pipeline {
         IMAGE_NAME = 'eunjitest_image/front:latest'
         NAMESPACE = 'eunjitest'
 
-        TAG = '' // 초기값을 비워둠
         GIT_CREDENTIALS_ID = 'jenkins-git-access'
 
         KUBECONFIG = '/home/azureuser/.kube/config' // Update this path to where your kubeconfig is stored on Jenkins.
         BRANCH_NAME = 'main' // 추가된 환경 변수
     }
 
-    stages {
-        stage('Checkout Code') {
-            steps {
-                checkout scm
-            }
-        }
+
         stage('Check BRANCH_NAME') {
             steps {
                 script {
@@ -34,16 +28,21 @@ pipeline {
         stage('Initialize') {
             steps {
                 script {
-                    // 브랜치 이름에 따라 태그와 네임스페이스 설정
-                    if (env.BRANCH_NAME == 'dev') {
+                    // 현재 체크아웃된 Git 브랜치 이름을 가져옵니다.
+                    def branch = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+                    echo "Checked out branch: ${branch}"
+                    
+                    if (branch == 'dev') {
                         env.TAG = 'dev'
-                    } else if (env.BRANCH_NAME == 'stg') {
+                    } else if (branch == 'stg') {
                         env.TAG = 'stg'
-                    } else if (env.BRANCH_NAME == 'prod') {
-                        env.TAG = 'latest' // 예시로 'latest'를 사용
+                    } else if (branch == 'prod') {
+                        env.TAG = 'latest'
+                    } else {
+                        env.TAG = 'unknown'
                     }
-                    // 환경 변수 TAG의 값을 출력
-                    sh "echo 'TAG is now set to ${env.TAG}'"
+                    
+                    echo "TAG is now set to ${env.TAG}"
                 }
             }
         }
