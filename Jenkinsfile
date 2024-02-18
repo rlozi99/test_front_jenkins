@@ -57,6 +57,11 @@ pipeline {
                             sh "kustomize build . | kubectl apply -f -"
                         }
                     }
+                    withCredentials([usernamePassword(credentialsId: 'acr-credential-id', passwordVariable: 'ACR_PASSWORD', usernameVariable: 'ACR_USERNAME')]) {
+                        sh "az acr login --name $CONTAINER_REGISTRY --username $ACR_USERNAME --password $ACR_PASSWORD"
+                        sh "docker build -t $CONTAINER_REGISTRY/$REPO:$TAG ."
+                        sh "docker push $CONTAINER_REGISTRY/$REPO:$TAG"
+                    }
                 }
             }
         }
