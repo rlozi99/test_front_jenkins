@@ -24,7 +24,6 @@ pipeline {
                 checkout scm
             }
         }
-        stages {
         stage('Initialize') {
             steps {
                 script {
