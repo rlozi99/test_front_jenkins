@@ -17,7 +17,7 @@ pipeline {
         BRANCH_NAME = 'main' // 추가된 환경 변수
     }
 
-
+    stages{
         stage('Check BRANCH_NAME') {
             steps {
                 script {
