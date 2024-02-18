@@ -80,10 +80,12 @@ pipeline {
                 }
             }
         }
-    
-// This assumes you have a 'withKubeConfig' shared library or function in Jenkins to handle kubeconfig.
-def withKubeConfig(Map args, Closure body) {
-    withCredentials([file(credentialsId: args.credentialsId, variable: 'KUBECONFIG')]) {
-        body.call()
     }
 }
+// This assumes you have a 'withKubeConfig' shared library or function in Jenkins to handle kubeconfig.
+// def withKubeConfig(Map args, Closure body) {
+//     withCredentials([file(credentialsId: args.credentialsId, variable: 'KUBECONFIG')]) {
+//         body.call()
+//     }
+// }
+    
