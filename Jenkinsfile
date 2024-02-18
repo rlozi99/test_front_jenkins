@@ -97,7 +97,12 @@ pipeline {
                     if (hasChanges) {
                         sh "git add ."
                         sh "git commit -m 'Update k8s configuration for ${env.BRANCH_NAME}'"
-                        sh "git push origin ${env.BRANCH_NAME}"
+                        // sh "git push origin ${env.BRANCH_NAME}"
+
+                        sh "git pull --rebase origin ${env.BRANCH_NAME}"
+                        def remote = "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/rlozi99/test_front_jenkins.git ${env.BRANCH_NAME}"
+                        // 원격 저장소에 푸시
+                        sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/rlozi99/test-front-ops.git ${env.BRANCH_NAME}"
                     } else {
                         echo "No changes to commit."
                     }
