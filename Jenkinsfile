@@ -59,7 +59,7 @@ pipeline {
                         sh "ls -la"
                         dir('overlays/development') {
                             sh "ls -la"
-                            sh "kustomize build . | kubectl apply -f -"
+                            sh "kustomize build . | kubectl apply -f - -n eunjitest"
                         }
                     }
                 }
