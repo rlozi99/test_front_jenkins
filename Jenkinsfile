@@ -25,7 +25,7 @@ pipeline {
                 }
             }
         }
-        stage('Initialize') {
+        stage('Initialize..') {
             steps {
                 script {
                     // Multibranch Pipeline에서 제공하는 BRANCH_NAME 환경 변수를 사용합니다.
