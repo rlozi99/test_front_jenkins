@@ -16,7 +16,8 @@ pipeline {
         KUBECONFIG = '/home/azureuser/.kube/config' 
 
         //kustomize taging git push
-        NEW_IMAGE_TAG = "${env.BRANCH_NAME}.${env.BUILD_ID}"    
+        NEW_IMAGE_TAG = "${env.BRANCH_NAME}.${env.BUILD_ID}"
+        GIT_REPOSITORY = "rlozi99/test-front-ops"    
     }
 
     stages{
@@ -103,9 +104,18 @@ pipeline {
                 script {
                     dir("overlays/${env.DIR_NAME}") {
                         // GitOps 저장소로 변경 사항을 커밋하고 푸시합니다.
+                        sh "git config user.email 'jenkins@example.com'"
+                        sh "git config user.name 'Jenkins'"
                         sh "git add ."
                         sh "git commit -m 'Update image tag to $NEW_IMAGE_TAG'"
-                        sh "git push origin ${env.BRANCH_NAME}"
+                        // Credential을 사용하여 GitHub에 push
+                        withCredentials([usernamePassword(credentialsId: 'jenkins-git-access', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                            // GIT_USERNAME과 GIT_PASSWORD 환경변수를 사용하여 push
+                            dir("overlays/${env.DIR_NAME}") {
+                                sh("git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_REPOSITORY}.git ${env.BRANCH_NAME}")
+                            }
+                        }
+                        // sh "git push origin ${env.BRANCH_NAME}"
                     }
                 }
             }
