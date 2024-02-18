@@ -44,6 +44,9 @@ pipeline {
                 credentialsId: GIT_CREDENTIALS_ID, 
                 url: 'https://github.com/rlozi99/test-front-ops.git'
             }
+            script {
+                    sh "ls -la"
+            }
         }
 
         stage('Update Kubernetes Configuration') {
