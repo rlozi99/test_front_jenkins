@@ -28,8 +28,8 @@ pipeline {
         stage('Initialize') {
             steps {
                 script {
-                    // 현재 체크아웃된 Git 브랜치 이름을 가져옵니다.
-                    def branch = sh(script: "git symbolic-ref --short HEAD", returnStdout: true).trim()
+                    // Multibranch Pipeline에서 제공하는 BRANCH_NAME 환경 변수를 사용합니다.
+                    def branch = env.BRANCH_NAME
                     echo "Checked out branch: ${branch}"
                     
                     if (branch == 'dev') {
@@ -46,6 +46,7 @@ pipeline {
                 }
             }
         }
+
 
 
         stage('Build and Push Docker Image to ACR') {
