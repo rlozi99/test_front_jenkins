@@ -15,7 +15,7 @@ pipeline {
         GIT_CREDENTIALS_ID = 'jenkins-git-access'
 
         KUBECONFIG = '/home/azureuser/.kube/config' // Update this path to where your kubeconfig is stored on Jenkins.
-        BRANCH_NAME = 'dev' // 추가된 환경 변수
+        BRANCH_NAME = 'main' // 추가된 환경 변수
     }
 
     stages {
