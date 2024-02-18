@@ -11,7 +11,7 @@ pipeline {
         IMAGE_NAME = 'eunjitest_image/front:latest'
         NAMESPACE = 'eunjitest'
 
-        TAG = 'dev'
+        TAG = '' // 초기값을 비워둠
         GIT_CREDENTIALS_ID = 'jenkins-git-access'
 
         KUBECONFIG = '/home/azureuser/.kube/config' // Update this path to where your kubeconfig is stored on Jenkins.
@@ -22,6 +22,21 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 checkout scm
+            }
+        }
+        stages {
+        stage('Initialize') {
+            steps {
+                script {
+                    // 브랜치 이름에 따라 태그와 네임스페이스 설정
+                    if (env.BRANCH_NAME == 'dev') {
+                        env.TAG = 'dev'
+                    } else if (env.BRANCH_NAME == 'stg') {
+                        env.TAG = 'stg'
+                    } else if (env.BRANCH_NAME == 'prod') {
+                        env.TAG = 'latest' // 예시로 'latest'를 사용
+                    }
+                }
             }
         }
 
@@ -68,17 +83,21 @@ pipeline {
         stage('Push Changes to GitOps Repository') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'jenkins-git-access', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                        // 현재 브랜치 확인 및 main으로 체크아웃
-                        def currentBranch = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
-                        if (currentBranch != "dev") {
-                            sh "git checkout dev"
-                        }
-                        // 원격 저장소에서 최신 변경사항 가져오기
-                        sh "git pull --rebase origin dev"
-                        def remote = "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/rlozi99/test_front_jenkins.git"
-                        // 원격 저장소에 푸시
-                        sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/rlozi99/test-front-ops.git main"
+
+                    sh "git add ."
+                    sh "git commit -m 'Update k8s configuration for $BRANCH_NAME'"
+                    sh "git push origin $BRANCH_NAME"
+                    // withCredentials([usernamePassword(credentialsId: 'jenkins-git-access', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    //     // 현재 브랜치 확인 및 main으로 체크아웃
+                    //     def currentBranch = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+                    //     if (currentBranch != "dev") {
+                    //         sh "git checkout dev"
+                    //     }
+                    //     // 원격 저장소에서 최신 변경사항 가져오기
+                    //     sh "git pull --rebase origin dev"
+                    //     def remote = "https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/rlozi99/test_front_jenkins.git"
+                    //     // 원격 저장소에 푸시
+                    //     sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/rlozi99/test-front-ops.git main"
                     }
                 }
             }
